@@ -1,0 +1,43 @@
+---
+- name: Recopilar información de paquetes instalados
+  ansible.builtin.package_facts:
+    manager: apt
+
+- name: Desinstalar Zabbix Agent 2 si existe
+  ansible.builtin.apt:
+    name:
+      - zabbix-agent2
+      - zabbix-agent2-plugin-*
+    state: absent
+    purge: true
+  when: "'zabbix-agent2' in ansible_facts.packages"
+
+- name: Descargar paquete de repositorio Zabbix
+  ansible.builtin.apt:
+    deb: "https://repo.zabbix.com/zabbix/{{ zabbix_version }}/debian/pool/main/z/zabbix-release/zabbix-release_latest+debian{{ ansible_distribution_major_version }}_all.deb"
+    state: present
+
+- name: Actualizar caché apt
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Instalar Zabbix Agent 2
+  ansible.builtin.apt:
+    name: "zabbix-agent2={{ zabbix_package_version }}"
+    state: present
+
+- name: Copiar archivo de configuración
+  ansible.builtin.template:
+    src: zabbix_agent2.conf.j2
+    dest: "{{ zabbix_agent_conf }}"
+    owner: root
+    group: zabbix
+    mode: "0640"
+  notify: Restart zabbix-agent2
+
+- name: Habilitar e iniciar servicio zabbix-agent2
+  ansible.builtin.systemd:
+    name: zabbix-agent2
+    enabled: true
+    state: started
+    daemon_reload: true

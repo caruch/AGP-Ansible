@@ -1,0 +1,6 @@
+---
+zabbix_win_install_dir: 'C:\Program Files\Zabbix Agent 2'
+zabbix_win_conf_dir:    'C:\Program Files\Zabbix Agent 2'
+zabbix_win_log_dir:     'C:\Program Files\Zabbix Agent 2\logs'
+zabbix_agent_timeout:   10
+zabbix_agent_logsize:   10

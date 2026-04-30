@@ -1,0 +1,50 @@
+---
+- name: Verificar si Zabbix Agent 2 está instalado
+  ansible.windows.win_service:
+    name: "Zabbix Agent 2"
+  register: zabbix_service
+  ignore_errors: true
+
+- name: Detener servicio existente antes de desinstalar
+  ansible.windows.win_service:
+    name: "Zabbix Agent 2"
+    state: stopped
+  when: zabbix_service.exists is defined and zabbix_service.exists
+
+- name: Desinstalar Zabbix Agent 2 existente
+  ansible.windows.win_package:
+    product_id: "Zabbix Agent 2"
+    state: absent
+  when: zabbix_service.exists is defined and zabbix_service.exists
+
+- name: Crear directorio de instalación
+  ansible.windows.win_file:
+    path: "{{ zabbix_win_install_dir }}"
+    state: directory
+
+- name: Descargar instalador MSI de Zabbix Agent 2
+  ansible.windows.win_get_url:
+    url: "https://cdn.zabbix.com/zabbix/binaries/stable/{{ zabbix_version }}/{{ zabbix_package_version }}/zabbix_agent2-{{ zabbix_package_version }}-windows-amd64-openssl.msi"
+    dest: "C:\\Windows\\Temp\\zabbix_agent2.msi"
+
+- name: Instalar Zabbix Agent 2
+  ansible.windows.win_package:
+    path: "C:\\Windows\\Temp\\zabbix_agent2.msi"
+    state: present
+    arguments: >
+      /quiet
+      SERVER={{ zabbix_server }}
+      SERVERACTIVE={{ zabbix_server }}
+      HOSTNAME={{ inventory_hostname }}
+
+- name: Copiar archivo de configuración
+  ansible.windows.win_template:
+    src: zabbix_agent2.conf.j2
+    dest: "{{ zabbix_win_conf_dir }}\\zabbix_agent2.conf"
+  notify: Restart zabbix-agent2 windows
+
+- name: Habilitar e iniciar servicio Zabbix Agent 2
+  ansible.windows.win_service:
+    name: "Zabbix Agent 2"
+    start_mode: auto
+    state: started

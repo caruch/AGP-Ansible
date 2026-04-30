@@ -1,0 +1,5 @@
+---
+zabbix_agent_log:      /var/log/zabbix/zabbix_agent2.log
+zabbix_agent_logsize:  10
+zabbix_agent_timeout:  10
+zabbix_agent_conf:     /etc/zabbix/zabbix_agent2.conf

@@ -1,0 +1,4 @@
+---
+# Cifrar este archivo con: ansible-vault encrypt inventory/group_vars/vault.yml
+vault_linux_pass: "CAMBIAR_PASSWORD_LINUX"
+vault_win_pass:   "CAMBIAR_PASSWORD_WINDOWS"

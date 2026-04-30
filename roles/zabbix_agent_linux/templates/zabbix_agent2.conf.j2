@@ -1,0 +1,15 @@
+# Zabbix Agent 2 - Configuración generada por Ansible
+# Host: {{ inventory_hostname }}
+
+PidFile=/run/zabbix/zabbix_agent2.pid
+LogFile={{ zabbix_agent_log }}
+LogFileSize={{ zabbix_agent_logsize }}
+
+Server={{ zabbix_server }}
+ServerActive={{ zabbix_server }}
+Hostname={{ inventory_hostname }}
+
+Timeout={{ zabbix_agent_timeout }}
+
+Include=/etc/zabbix/zabbix_agent2.d/*.conf
+ControlSocket=/tmp/agent.sock

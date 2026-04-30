@@ -1,0 +1,11 @@
+# Zabbix Agent 2 - Configuración generada por Ansible
+# Host: {{ inventory_hostname }}
+
+LogFile={{ zabbix_win_log_dir }}\zabbix_agent2.log
+LogFileSize={{ zabbix_agent_logsize }}
+
+Server={{ zabbix_server }}
+ServerActive={{ zabbix_server }}
+Hostname={{ inventory_hostname }}
+
+Timeout={{ zabbix_agent_timeout }}

@@ -1,0 +1,12 @@
+---
+- name: Deploy Zabbix Agent 2 - Linux
+  hosts: linux
+  gather_facts: true
+  roles:
+    - role: zabbix_agent_linux
+
+- name: Deploy Zabbix Agent 2 - Windows
+  hosts: windows
+  gather_facts: true
+  roles:
+    - role: zabbix_agent_windows
