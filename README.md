@@ -1,4 +1,4 @@
-# AGP-Ansible-Claude — Zabbix Agent 2 Deployment
+# AGP-Ansible — Zabbix Agent 2 Deployment
 
 Playbook de Ansible para desplegar, actualizar y configurar **Zabbix Agent 2** en granjas de servidores Linux (Debian) y Windows de forma unificada.
 
