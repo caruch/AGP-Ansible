@@ -1,21 +1,17 @@
 ---
-- name: Verificar si Zabbix Agent 2 está instalado
-  ansible.windows.win_service:
-    name: "Zabbix Agent 2"
-  register: zabbix_service
-  ignore_errors: true
+- name: Obtener versión instalada de Zabbix Agent 2
+  ansible.windows.win_shell: |
+    $pkg = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "Zabbix Agent 2*" }
+    if ($pkg) { $pkg.Version } else { "none" }
+  register: installed_version
+  changed_when: false
 
-- name: Detener servicio existente antes de desinstalar
-  ansible.windows.win_service:
-    name: "Zabbix Agent 2"
-    state: stopped
-  when: zabbix_service.exists is defined and zabbix_service.exists
-
-- name: Desinstalar Zabbix Agent 2 existente
+- name: Desinstalar si la versión instalada es distinta a la requerida
   ansible.windows.win_package:
     product_id: "Zabbix Agent 2"
     state: absent
-  when: zabbix_service.exists is defined and zabbix_service.exists
+  when: installed_version.stdout.strip() != zabbix_package_version
+        and installed_version.stdout.strip() != "none"
 
 - name: Crear directorio de instalación
   ansible.windows.win_file:
@@ -27,7 +23,7 @@
     url: "https://cdn.zabbix.com/zabbix/binaries/stable/{{ zabbix_version }}/{{ zabbix_package_version }}/zabbix_agent2-{{ zabbix_package_version }}-windows-amd64-openssl.msi"
     dest: "C:\\Windows\\Temp\\zabbix_agent2.msi"
 
-- name: Instalar Zabbix Agent 2
+- name: Instalar Zabbix Agent 2 en versión exacta
   ansible.windows.win_package:
     path: "C:\\Windows\\Temp\\zabbix_agent2.msi"
     state: present
@@ -36,6 +32,7 @@
       SERVER={{ zabbix_server }}
       SERVERACTIVE={{ zabbix_server }}
       HOSTNAME={{ inventory_hostname }}
+  when: installed_version.stdout.strip() != zabbix_package_version
 
 - name: Copiar archivo de configuración
   ansible.windows.win_template:
